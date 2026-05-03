@@ -7,10 +7,15 @@ $requestUri = $_SERVER['REQUEST_URI'];
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 
 $path = parse_url($requestUri, PHP_URL_PATH);
-$path = str_replace('/api', '', $path);
+
+// Strip base path up to and including /api
+$basePath = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
+if ($basePath !== '' && strpos($path, $basePath) === 0) {
+    $path = substr($path, strlen($basePath));
+}
 $path = trim($path, '/');
 
-if (empty($path) || $path === '') {
+if ($path === '' || $path === 'index.php') {
     require_once dirname(__DIR__) . '/index.php';
     exit;
 }
@@ -21,35 +26,110 @@ $id = $parts[1] ?? null;
 
 try {
     switch ($resource) {
-        case 'transactions':
-            require_once __DIR__ . '/transactions.php';
-            $api = new TransactionAPI();
-            
+        case 'cash-in':
+            require_once __DIR__ . '/cash-in.php';
+            $api = new CashInAPI();
             switch ($requestMethod) {
                 case 'GET':
-                    if ($id) {
-                        $api->getById($id);
-                    } else {
-                        $api->getAll();
-                    }
+                    $id ? $api->getById($id) : $api->getAll();
                     break;
                 case 'POST':
                     $api->create();
                     break;
                 case 'PUT':
                 case 'PATCH':
-                    if ($id) {
-                        $api->update($id);
-                    } else {
-                        Response::badRequest("Transaction ID required");
-                    }
+                    $id ? $api->update($id) : Response::badRequest("ID required");
                     break;
                 case 'DELETE':
-                    if ($id) {
-                        $api->delete($id);
-                    } else {
-                        Response::badRequest("Transaction ID required");
-                    }
+                    $id ? $api->delete($id) : Response::badRequest("ID required");
+                    break;
+                default:
+                    Response::badRequest("Method not allowed");
+            }
+            break;
+
+        case 'cash-out':
+            require_once __DIR__ . '/cash-out.php';
+            $api = new CashOutAPI();
+            switch ($requestMethod) {
+                case 'GET':
+                    $id ? $api->getById($id) : $api->getAll();
+                    break;
+                case 'POST':
+                    $api->create();
+                    break;
+                case 'PUT':
+                case 'PATCH':
+                    $id ? $api->update($id) : Response::badRequest("ID required");
+                    break;
+                case 'DELETE':
+                    $id ? $api->delete($id) : Response::badRequest("ID required");
+                    break;
+                default:
+                    Response::badRequest("Method not allowed");
+            }
+            break;
+
+        case 'dena':
+            require_once __DIR__ . '/dena.php';
+            $api = new DenaAPI();
+            switch ($requestMethod) {
+                case 'GET':
+                    $id ? $api->getById($id) : $api->getAll();
+                    break;
+                case 'POST':
+                    $api->create();
+                    break;
+                case 'PUT':
+                case 'PATCH':
+                    $id ? $api->update($id) : Response::badRequest("ID required");
+                    break;
+                case 'DELETE':
+                    $id ? $api->delete($id) : Response::badRequest("ID required");
+                    break;
+                default:
+                    Response::badRequest("Method not allowed");
+            }
+            break;
+
+        case 'paona':
+            require_once __DIR__ . '/paona.php';
+            $api = new PaonaAPI();
+            switch ($requestMethod) {
+                case 'GET':
+                    $id ? $api->getById($id) : $api->getAll();
+                    break;
+                case 'POST':
+                    $api->create();
+                    break;
+                case 'PUT':
+                case 'PATCH':
+                    $id ? $api->update($id) : Response::badRequest("ID required");
+                    break;
+                case 'DELETE':
+                    $id ? $api->delete($id) : Response::badRequest("ID required");
+                    break;
+                default:
+                    Response::badRequest("Method not allowed");
+            }
+            break;
+
+        case 'transactions':
+            require_once __DIR__ . '/transactions.php';
+            $api = new TransactionAPI();
+            switch ($requestMethod) {
+                case 'GET':
+                    $id ? $api->getById($id) : $api->getAll();
+                    break;
+                case 'POST':
+                    $api->create();
+                    break;
+                case 'PUT':
+                case 'PATCH':
+                    $id ? $api->update($id) : Response::badRequest("Transaction ID required");
+                    break;
+                case 'DELETE':
+                    $id ? $api->delete($id) : Response::badRequest("Transaction ID required");
                     break;
                 default:
                     Response::badRequest("Method not allowed");
@@ -59,32 +139,19 @@ try {
         case 'dues':
             require_once __DIR__ . '/dues.php';
             $api = new DuesAPI();
-            
             switch ($requestMethod) {
                 case 'GET':
-                    if ($id) {
-                        $api->getById($id);
-                    } else {
-                        $api->getAll();
-                    }
+                    $id ? $api->getById($id) : $api->getAll();
                     break;
                 case 'POST':
                     $api->create();
                     break;
                 case 'PUT':
                 case 'PATCH':
-                    if ($id) {
-                        $api->update($id);
-                    } else {
-                        Response::badRequest("Due ID required");
-                    }
+                    $id ? $api->update($id) : Response::badRequest("Due ID required");
                     break;
                 case 'DELETE':
-                    if ($id) {
-                        $api->delete($id);
-                    } else {
-                        Response::badRequest("Due ID required");
-                    }
+                    $id ? $api->delete($id) : Response::badRequest("Due ID required");
                     break;
                 default:
                     Response::badRequest("Method not allowed");
@@ -94,7 +161,6 @@ try {
         case 'profile':
             require_once __DIR__ . '/profile.php';
             $api = new ProfileAPI();
-            
             switch ($requestMethod) {
                 case 'GET':
                     $api->get();
@@ -111,7 +177,6 @@ try {
         case 'extract':
             require_once __DIR__ . '/extract.php';
             $api = new ExtractAPI();
-            
             switch ($requestMethod) {
                 case 'POST':
                     $api->extract();

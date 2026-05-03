@@ -1,24 +1,7 @@
+Options +FollowSymLinks
 RewriteEngine On
 RewriteBase /HishebiApi/api/
 
-# Cash In
-RewriteRule ^cash-in$ cash-in.php [L]
-RewriteRule ^cash-in/(.*)$ cash-in.php?id=$1 [L]
-
-# Cash Out
-RewriteRule ^cash-out$ cash-out.php [L]
-RewriteRule ^cash-out/(.*)$ cash-out.php?id=$1 [L]
-
-# Dena
-RewriteRule ^dena$ dena.php [L]
-RewriteRule ^dena/(.*)$ dena.php?id=$1 [L]
-
-# Paona
-RewriteRule ^paona$ paona.php [L]
-RewriteRule ^paona/(.*)$ paona.php?id=$1 [L]
-
-# Profile
-RewriteRule ^profile$ profile.php [L]
-
-# Extract
-RewriteRule ^extract$ extract.php [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [QSA,L]
