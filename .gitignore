@@ -1,0 +1,4 @@
+# SQLite databases — kept local/server-side only, never pushed via git
+*.db
+*.db-shm
+*.db-wal

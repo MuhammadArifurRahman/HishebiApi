@@ -28,35 +28,60 @@ class Database {
 
     private function initTables() {
         $sql = "
-            CREATE TABLE IF NOT EXISTS transactions (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                title TEXT NOT NULL,
-                amount REAL NOT NULL,
-                type TEXT NOT NULL CHECK(type IN ('in', 'out')),
-                date TEXT NOT NULL,
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY,
+                name TEXT NOT NULL,
+                email TEXT UNIQUE,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             );
 
-            CREATE TABLE IF NOT EXISTS dues (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+            CREATE TABLE IF NOT EXISTS cash_in (
+                id INTEGER PRIMARY KEY,
+                user_id INTEGER,
+                title TEXT NOT NULL,
+                amount REAL NOT NULL,
+                date TEXT NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            );
+
+            CREATE TABLE IF NOT EXISTS cash_out (
+                id INTEGER PRIMARY KEY,
+                user_id INTEGER,
+                title TEXT NOT NULL,
+                amount REAL NOT NULL,
+                date TEXT NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            );
+
+            CREATE TABLE IF NOT EXISTS dena (
+                id INTEGER PRIMARY KEY,
+                user_id INTEGER,
                 name TEXT NOT NULL,
                 address TEXT,
                 mobile TEXT NOT NULL,
                 reason TEXT,
                 amount REAL NOT NULL,
-                type TEXT NOT NULL CHECK(type IN ('owe', 'receivable')),
                 due_date TEXT,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id)
             );
 
-            CREATE TABLE IF NOT EXISTS user_profile (
-                id INTEGER PRIMARY KEY CHECK (id = 1),
-                name TEXT NOT NULL DEFAULT 'User',
-                email TEXT NOT NULL DEFAULT 'user@example.com',
-                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            CREATE TABLE IF NOT EXISTS paona (
+                id INTEGER PRIMARY KEY,
+                user_id INTEGER,
+                name TEXT NOT NULL,
+                address TEXT,
+                mobile TEXT NOT NULL,
+                reason TEXT,
+                amount REAL NOT NULL,
+                due_date TEXT,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id)
             );
 
-            INSERT OR IGNORE INTO user_profile (id, name, email) VALUES (1, 'User', 'user@example.com');
+            INSERT OR IGNORE INTO users (id, name, email) VALUES (1, 'User', 'user@example.com');
         ";
 
         $this->pdo->exec($sql);

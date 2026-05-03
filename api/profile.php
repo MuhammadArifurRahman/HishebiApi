@@ -5,16 +5,18 @@ require_once dirname(__DIR__) . '/includes/Response.php';
 
 class ProfileAPI {
     private $db;
+    private $userId = 1;
 
     public function __construct() {
         $this->db = new Database();
     }
 
     public function get() {
-        $stmt = $this->db->getConnection()->query("
-            SELECT name, email, updated_at as updatedAt
-            FROM user_profile WHERE id = 1
+        $stmt = $this->db->getConnection()->prepare("
+            SELECT id, name, email, created_at as createdAt
+            FROM users WHERE id = ?
         ");
+        $stmt->execute([$this->userId]);
         $profile = $stmt->fetch();
 
         if (!$profile) {
@@ -47,9 +49,9 @@ class ProfileAPI {
             $values[] = $input['email'];
         }
 
-        $fields[] = "updated_at = CURRENT_TIMESTAMP";
+        $values[] = $this->userId;
 
-        $sql = "UPDATE user_profile SET " . implode(", ", $fields) . " WHERE id = 1";
+        $sql = "UPDATE users SET " . implode(", ", $fields) . " WHERE id = ?";
         $stmt = $this->db->getConnection()->prepare($sql);
         $stmt->execute($values);
 

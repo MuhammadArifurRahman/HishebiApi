@@ -6,7 +6,6 @@ header('Content-Type: text/html; charset=UTF-8');
 
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-$requestUri = $_SERVER['REQUEST_URI'] ?? '/';
 $scriptDir = dirname($_SERVER['SCRIPT_NAME']);
 if ($scriptDir === '.' || $scriptDir === '/') {
     $scriptDir = '';
@@ -22,6 +21,7 @@ if (substr($baseUrl, -1) === '/') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo APP_NAME; ?> - REST API Documentation</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; line-height: 1.6; }
@@ -44,8 +44,7 @@ if (substr($baseUrl, -1) === '/') {
         .example-title { font-size: 14px; color: #666; margin-bottom: 5px; }
         .note { background: #fff3cd; border-left: 4px solid #ffc107; padding: 10px 15px; margin-top: 20px; }
         .db-info { background: #e8f4fd; border-left: 4px solid #3498db; padding: 10px 15px; margin-bottom: 20px; }
-        .alt-url { color: #7f8c8d; font-size: 13px; margin-top: 5px; }
-        .api-link { display: inline-block; background: #3498db; color: white; padding: 8px 15px; border-radius: 5px; text-decoration: none; margin: 5px 0; }
+        .api-link { display: inline-block; background: #3498db; color: white; padding: 8px 15px; border-radius: 5px; text-decoration: none; margin: 5px 5px 5px 0; }
         .api-link:hover { background: #2980b9; }
     </style>
 </head>
@@ -61,120 +60,219 @@ if (substr($baseUrl, -1) === '/') {
         <div class="section">
             <h2>Test Links</h2>
             <p>Click to test the API endpoints:</p>
-            <a href="<?php echo $baseUrl; ?>/api/transactions.php" class="api-link">GET Transactions</a>
-            <a href="<?php echo $baseUrl; ?>/api/dues.php" class="api-link">GET Dues</a>
-            <a href="<?php echo $baseUrl; ?>/api/profile.php" class="api-link">GET Profile</a>
+            <a href="<?php echo $baseUrl; ?>/api/cash-in" class="api-link">GET Cash In</a>
+            <a href="<?php echo $baseUrl; ?>/api/cash-out" class="api-link">GET Cash Out</a>
+            <a href="<?php echo $baseUrl; ?>/api/dena" class="api-link">GET Dena</a>
+            <a href="<?php echo $baseUrl; ?>/api/paona" class="api-link">GET Paona</a>
+            <a href="<?php echo $baseUrl; ?>/api/profile" class="api-link">GET Profile</a>
         </div>
 
         <div class="section">
             <h2>Base URL</h2>
-            <code><?php echo $baseUrl; ?>/</code>
-            <p>You can access API via router or direct PHP files:</p>
+            <code><?php echo $baseUrl; ?>/api/</code>
+            <p>All endpoints use clean URLs via .htaccess rewriting</p>
         </div>
 
         <div class="section">
-            <h2>A. Transactions API</h2>
-            <p>Manage income and expense transactions</p>
+            <h2>A. Cash In API</h2>
+            <p>Manage income/money received</p>
             
             <div class="endpoint">
-                <h3><span class="method method-get">GET</span> Get All Transactions</h3>
-                <span class="path"><?php echo $baseUrl; ?>/api/transactions.php</span>
-                <p class="alt-url">Alt: <?php echo $baseUrl; ?>/api/transactions</p>
+                <h3><span class="method method-get">GET</span> Get All Cash In Entries</h3>
+                <span class="path"><?php echo $baseUrl; ?>/api/cash-in</span>
                 <p>Query params: <code>?limit=10</code> <code>&amp;offset=0</code></p>
                 <div class="example">
                     <div class="example-title">Response:</div>
                     <pre>{
   "success": true,
   "data": {
-    "transactions": [...],
+    "entries": [...],
     "pagination": { "limit": 10, "offset": 0 },
-    "summary": { "cashIn": 1000, "cashOut": 500, "balance": 500 }
+    "summary": { "total": 50000 }
   }
 }</pre>
                 </div>
             </div>
 
             <div class="endpoint">
-                <h3><span class="method method-post">POST</span> Create Transaction</h3>
-                <span class="path"><?php echo $baseUrl; ?>/api/transactions.php</span>
-                <p class="alt-url">Alt: <?php echo $baseUrl; ?>/api/transactions</p>
+                <h3><span class="method method-post">POST</span> Create Cash In Entry</h3>
+                <span class="path"><?php echo $baseUrl; ?>/api/cash-in</span>
                 <div class="example">
                     <div class="example-title">Request Body:</div>
                     <pre>{
   "title": "Salary",
-  "amount": 5000,
-  "type": "in",
-  "date": "2024-01-15"
+  "amount": 25000,
+  "date": "2026-05-01"
 }</pre>
                 </div>
             </div>
 
             <div class="endpoint">
-                <h3><span class="method method-put">PUT</span> Update Transaction</h3>
-                <span class="path"><?php echo $baseUrl; ?>/api/transactions.php?id=1</span>
-                <p class="alt-url">Alt: <?php echo $baseUrl; ?>/api/transactions/1</p>
+                <h3><span class="method method-put">PUT</span> Update Cash In Entry</h3>
+                <span class="path"><?php echo $baseUrl; ?>/api/cash-in/{id}</span>
             </div>
 
             <div class="endpoint">
-                <h3><span class="method method-delete">DELETE</span> Delete Transaction</h3>
-                <span class="path"><?php echo $baseUrl; ?>/api/transactions.php?id=1</span>
-                <p class="alt-url">Alt: <?php echo $baseUrl; ?>/api/transactions/1</p>
+                <h3><span class="method method-delete">DELETE</span> Delete Cash In Entry</h3>
+                <span class="path"><?php echo $baseUrl; ?>/api/cash-in/{id}</span>
             </div>
         </div>
 
         <div class="section">
-            <h2>B. Dues &amp; Debt API</h2>
-            <p>Manage owed and receivable amounts</p>
+            <h2>B. Cash Out API</h2>
+            <p>Manage expenses/money spent</p>
             
             <div class="endpoint">
-                <h3><span class="method method-get">GET</span> Get All Dues</h3>
-                <span class="path"><?php echo $baseUrl; ?>/api/dues.php</span>
-                <p class="alt-url">Alt: <?php echo $baseUrl; ?>/api/dues</p>
+                <h3><span class="method method-get">GET</span> Get All Cash Out Entries</h3>
+                <span class="path"><?php echo $baseUrl; ?>/api/cash-out</span>
+                <p>Query params: <code>?limit=10</code> <code>&amp;offset=0</code></p>
+                <div class="example">
+                    <div class="example-title">Response:</div>
+                    <pre>{
+  "success": true,
+  "data": {
+    "entries": [...],
+    "pagination": { "limit": 10, "offset": 0 },
+    "summary": { "total": 5000 }
+  }
+}</pre>
+                </div>
             </div>
 
             <div class="endpoint">
-                <h3><span class="method method-post">POST</span> Create Due</h3>
-                <span class="path"><?php echo $baseUrl; ?>/api/dues.php</span>
-                <p class="alt-url">Alt: <?php echo $baseUrl; ?>/api/dues</p>
+                <h3><span class="method method-post">POST</span> Create Cash Out Entry</h3>
+                <span class="path"><?php echo $baseUrl; ?>/api/cash-out</span>
                 <div class="example">
                     <div class="example-title">Request Body:</div>
                     <pre>{
-  "name": "John Doe",
-  "mobile": "+254700000000",
-  "amount": 1000,
-  "type": "owe",
-  "reason": "Loan",
-  "dueDate": "2024-02-01"
+  "title": "Groceries",
+  "amount": 1500,
+  "date": "2026-05-02"
 }</pre>
                 </div>
             </div>
 
             <div class="endpoint">
-                <h3><span class="method method-put">PUT</span> Update Due</h3>
-                <span class="path"><?php echo $baseUrl; ?>/api/dues.php?id=1</span>
-                <p class="alt-url">Alt: <?php echo $baseUrl; ?>/api/dues/1</p>
+                <h3><span class="method method-put">PUT</span> Update Cash Out Entry</h3>
+                <span class="path"><?php echo $baseUrl; ?>/api/cash-out/{id}</span>
             </div>
 
             <div class="endpoint">
-                <h3><span class="method method-delete">DELETE</span> Delete Due</h3>
-                <span class="path"><?php echo $baseUrl; ?>/api/dues.php?id=1</span>
-                <p class="alt-url">Alt: <?php echo $baseUrl; ?>/api/dues/1</p>
+                <h3><span class="method method-delete">DELETE</span> Delete Cash Out Entry</h3>
+                <span class="path"><?php echo $baseUrl; ?>/api/cash-out/{id}</span>
             </div>
         </div>
 
         <div class="section">
-            <h2>C. User Profile API</h2>
+            <h2>C. Dena API</h2>
+            <p>Money you owe to others</p>
+            
+            <div class="endpoint">
+                <h3><span class="method method-get">GET</span> Get All Dena Entries</h3>
+                <span class="path"><?php echo $baseUrl; ?>/api/dena</span>
+                <div class="example">
+                    <div class="example-title">Response:</div>
+                    <pre>{
+  "success": true,
+  "data": {
+    "entries": [...],
+    "summary": { "totalOwe": 5000 }
+  }
+}</pre>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <h3><span class="method method-post">POST</span> Create Dena Entry</h3>
+                <span class="path"><?php echo $baseUrl; ?>/api/dena</span>
+                <div class="example">
+                    <div class="example-title">Request Body:</div>
+                    <pre>{
+  "name": "Abir",
+  "mobile": "01700000000",
+  "amount": 500,
+  "reason": "Borrowed for lunch"
+}</pre>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <h3><span class="method method-put">PUT</span> Update Dena Entry</h3>
+                <span class="path"><?php echo $baseUrl; ?>/api/dena/{id}</span>
+            </div>
+
+            <div class="endpoint">
+                <h3><span class="method method-delete">DELETE</span> Delete Dena Entry</h3>
+                <span class="path"><?php echo $baseUrl; ?>/api/dena/{id}</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>D. Paona API</h2>
+            <p>Money others owe to you (receivable)</p>
+            
+            <div class="endpoint">
+                <h3><span class="method method-get">GET</span> Get All Paona Entries</h3>
+                <span class="path"><?php echo $baseUrl; ?>/api/paona</span>
+                <div class="example">
+                    <div class="example-title">Response:</div>
+                    <pre>{
+  "success": true,
+  "data": {
+    "entries": [...],
+    "summary": { "totalReceivable": 10000 }
+  }
+}</pre>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <h3><span class="method method-post">POST</span> Create Paona Entry</h3>
+                <span class="path"><?php echo $baseUrl; ?>/api/paona</span>
+                <div class="example">
+                    <div class="example-title">Request Body:</div>
+                    <pre>{
+  "name": "John",
+  "mobile": "01800000000",
+  "amount": 1000,
+  "reason": "Loan given"
+}</pre>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <h3><span class="method method-put">PUT</span> Update Paona Entry</h3>
+                <span class="path"><?php echo $baseUrl; ?>/api/paona/{id}</span>
+            </div>
+
+            <div class="endpoint">
+                <h3><span class="method method-delete">DELETE</span> Delete Paona Entry</h3>
+                <span class="path"><?php echo $baseUrl; ?>/api/paona/{id}</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>E. Profile API</h2>
+            <p>User profile management</p>
             
             <div class="endpoint">
                 <h3><span class="method method-get">GET</span> Get Profile</h3>
-                <span class="path"><?php echo $baseUrl; ?>/api/profile.php</span>
-                <p class="alt-url">Alt: <?php echo $baseUrl; ?>/api/profile</p>
+                <span class="path"><?php echo $baseUrl; ?>/api/profile</span>
+                <div class="example">
+                    <div class="example-title">Response:</div>
+                    <pre>{
+  "success": true,
+  "data": {
+    "name": "User",
+    "email": "user@example.com"
+  }
+}</pre>
+                </div>
             </div>
 
             <div class="endpoint">
                 <h3><span class="method method-put">PUT</span> Update Profile</h3>
-                <span class="path"><?php echo $baseUrl; ?>/api/profile.php</span>
-                <p class="alt-url">Alt: <?php echo $baseUrl; ?>/api/profile</p>
+                <span class="path"><?php echo $baseUrl; ?>/api/profile</span>
                 <div class="example">
                     <div class="example-title">Request Body:</div>
                     <pre>{
@@ -186,13 +284,12 @@ if (substr($baseUrl, -1) === '/') {
         </div>
 
         <div class="section">
-            <h2>D. Extract API</h2>
+            <h2>F. Extract API</h2>
             <p>Natural language text extraction</p>
             
             <div class="endpoint">
                 <h3><span class="method method-post">POST</span> Extract from Text</h3>
-                <span class="path"><?php echo $baseUrl; ?>/api/extract.php</span>
-                <p class="alt-url">Alt: <?php echo $baseUrl; ?>/api/extract</p>
+                <span class="path"><?php echo $baseUrl; ?>/api/extract</span>
                 <div class="example">
                     <div class="example-title">Request Body:</div>
                     <pre>{
@@ -203,20 +300,17 @@ if (substr($baseUrl, -1) === '/') {
   "title": "Salary",
   "amount": 5000,
   "type": "in",
-  "date": "2024-01-15"
+  "date": "2026-05-03"
 }</pre>
                 </div>
             </div>
         </div>
 
         <div class="note">
-            <strong>Note:</strong> All endpoints support two URL formats:
+            <strong>Note:</strong> All endpoints use clean URLs (no .php extension). 
+            The .htaccess file handles URL routing automatically.
             <br><br>
-            1. <strong>Direct PHP files:</strong> <code>/api/transactions.php</code> - Use <code>?id=1</code> for single record operations
-            <br>
-            2. <strong>Router format:</strong> <code>/api/transactions/1</code> - For single record, omit ID for list
-            <br><br>
-            All write endpoints return JSON responses with <code>Content-Type: application/json</code>. HTML documentation is shown only on root access.
+            All write endpoints return JSON responses with <code>Content-Type: application/json</code>.
         </div>
     </div>
 </body>
