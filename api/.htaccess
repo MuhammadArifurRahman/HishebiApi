@@ -1,4 +1,5 @@
 RewriteEngine On
+RewriteBase /HishebiApi/api/
 
 # Cash In
 RewriteRule ^cash-in$ cash-in.php [L]
